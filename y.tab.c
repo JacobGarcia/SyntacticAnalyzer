@@ -122,18 +122,17 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 4 "SyntaxAnalyzer.y"
+#line 58 "SyntaxAnalyzer.y"
 
-	#include <stdio.h>  
-	#include <stdlib.h>
-	#include <string.h>
+	#include <stdio.h> /* Used for the printf function */
+	#include <stdlib.h> /* Used for the exit() function when an error is 
+                        discovered */
 
 	/* Function definitions */
-	void yyerror (char *string);
+	void yyerror (char *string); /* Bison does NOT implement yyerror */
 
 	extern int yylex(void); /* Function from Flex that Bison needs to know about */
 	extern int numberLines; /* Counter of newlines. Defined in Flex */
-	extern char *yytext;
 
 
 /* Enabling traces.  */
@@ -156,13 +155,13 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 17 "SyntaxAnalyzer.y"
+#line 72 "SyntaxAnalyzer.y"
 {
-	int intVal;
-	float floatVal;
+	int intVal; /* Value of int number */
+	float floatVal; /* Value of float number */
 }
 /* Line 193 of yacc.c.  */
-#line 166 "y.tab.c"
+#line 165 "y.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -175,7 +174,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 179 "y.tab.c"
+#line 178 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -472,10 +471,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    56,    56,    59,    60,    63,    66,    67,    70,    71,
-      74,    75,    76,    77,    78,    79,    80,    83,    86,    87,
-      90,    91,    92,    95,    96,    97,   100,   101,   102,   103,
-     106,   109
+       0,   113,   113,   116,   117,   120,   123,   124,   127,   128,
+     131,   132,   133,   134,   135,   136,   137,   140,   143,   144,
+     147,   148,   149,   152,   153,   154,   157,   158,   159,   160,
+     163,   166
 };
 #endif
 
@@ -1417,7 +1416,7 @@ yyreduce:
     {
       
 /* Line 1267 of yacc.c.  */
-#line 1421 "y.tab.c"
+#line 1420 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1631,22 +1630,39 @@ yyreturn:
 }
 
 
-#line 110 "SyntaxAnalyzer.y"
+#line 167 "SyntaxAnalyzer.y"
 
 
-/* Bison does NOT implement yyerror, so define it here */
+/*************************************************************************/
+/*                                                                       */
+/*  Function: yyerror                            		                 */
+/*                                                                       */
+/*  Purpose: The function will be called in case Bison finds a rule not  */
+/*			 defined in the grammar                                      */
+/*                                                                       */
+/*  Parameters:                                                          */
+/*            Input : A string indicating the type of error. Since it    */
+/*					  is only cared about syntactic errors, the input is */
+/*					  basically ignored. Due to the fact that Bison      */
+/*					  expects sending a string when calls yyerror, the   */
+/*					  function must remain it's default definition       */
+/*                                                                       */
+/*            Output:   The line where the syntax error occured (see 	 */
+/*						notes for possible side effects)         		 */
+/*                                                                       */
+/*************************************************************************/
 void yyerror(char *string){
-	printf("yytext is = %s", yytext);
-   if(strcmp(yytext, "\n") == 0)
-   	numberLines--;
-
    printf("Syntax error in line %d \n\n", numberLines);
    exit(-1);
 }
 
-/* Bison does NOT define the main entry point so define it here */
+/*************************************************************************/
+/*                            Main entry point                           */
+/*************************************************************************/ 
 int main(){
    yyparse();
+
+   /* If there was no errors, finish the program and a legend to it */
    printf("There is no syntax errors in the code\n\n");
    return 0;
 }

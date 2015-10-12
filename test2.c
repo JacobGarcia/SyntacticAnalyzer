@@ -2,7 +2,7 @@
 
 int j;
 float i;
-int h;
+int $h;
 int j1;
 int i1;
 int h1;

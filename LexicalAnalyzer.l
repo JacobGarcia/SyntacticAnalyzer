@@ -11,10 +11,9 @@
 /*          This program implements a basic lexical analyzer for Tiny C, */
 /*          a subset of the C language.                                  */
 /*                                                                       */
-/* Usage:   The scanner reads an input file from the command line. The   */
-/*          usage form is:                                               */
-/*                                                                       */
-/*          scanner < file.c                                             */
+/* Usage:   The scanner was written considering to be used with Bison.   */
+/*          Since that's the case, the program is not designed to run    */
+/*          as a standalone.                                             */
 /*                                                                       */
 /* References:                                                           */
 /*          The material that describes regular expressions and Lex/Flex */
@@ -38,18 +37,14 @@
 /*          Sep 09 20:10 2015 - The scanner recognizes all the           */
 /*                              specified tokens                         */
 /*                                                                       */
+/*          Oct 11 14:12 2015 - The program was modified to return       */
+/*                              tokens for Bison usage instead of        */
+/*                              printing them                            */
 /*                                                                       */
 /* Error handling:                                                       */
-/*          When unknown tokens are found, the program indicates an error */
-/*          on the line where the token is found and shows the actual    */
-/*          unknown token                                                 */
-/*                                                                       */
-/* Notes:                                                                */
-/*          The output is in a table-like format, with 2 columns: The    */
-/*          type of the token and the value for it. Since multi-line     */
-/*          comments are handled, consider that the output in the table  */
-/*          for those is not managed perfectly. Everything else works    */
-/*          really fine in the table format                              */
+/*          When unknown tokens are found, the program indicates an      */
+/*          error on the line where the token was found and shows the    */
+/*          actual unknown token. Then, the program exits.               */
 /*                                                                       */
 /*************************************************************************/
 
@@ -69,7 +64,9 @@
 /*                                                                       */
 /*************************************************************************/
 %{
-    #include "y.tab.h"
+    #include <stdlib.h> /* Used for the exit() function when an error is 
+                        discovered */
+    #include "y.tab.h" /* Inclusion of Bison reference tokens */
     int idToDel = 1; 
     int numberLines = 1;
 %}
@@ -93,9 +90,6 @@
 /*                                                                       */
 /*  ID: Identifiers that are supported in ANSI C                         */
 /*                                                                       */
-/*  OPERATOR: Arithmetic operator: Addition, subtraction, multiplication */
-/*            and finally division                                       */
-/*                                                                       */
 /*  KEYWORD: A set of reserved words supported by Tiny C                 */
 /*                                                                       */
 /*  RELATIONAL: Tokens used when comparing two elements                  */
@@ -103,9 +97,9 @@
 /*  ASSIGNMENT: Used when assigning a value to an identifier. Consider   */
 /*              that the operator does not follows the ANSI C '='        */
 /*                                                                       */
-/*  COMMENT: A regular expression that takes account all the possible    */
-/*           types of comments in ANSI C. Considering single-line        */
-/*           comments and multi-line ones                                */
+/*  COMMENT: A routine declaration used to handle comments. It takes     */
+/*           account all the possible types of comments in ANSI C.       */
+/*           Considering single-line comments and multi-line ones        */
 /*                                                                       */
 /*************************************************************************/
 DIGIT		[0-9]|[1-9][0-9]* 
@@ -115,34 +109,35 @@ OCTAL		0(c|C)[0-7]+
 ID       	[A-Za-z_][A-Za-z0-9_]*
 RELATIONAL 	<|<=|>|>=|!=|==
 ASSIGNMENT	:=
-COMMENT     ("/*"([^*]|([*]+[^*/]))*[*]+"/")|"//".*
+%x COMMENT 
 
 /*************************************************************************/
 /*                              Rules Section                            */
 /*************************************************************************/
-%x COMMENT
 %%
-
-
-"/*"              BEGIN(COMMENT); /* Ignore comments routine */
+"/*"              BEGIN(COMMENT); /* In case a comment is discovered, begin the 
+                                    routine to handle comments */
 
 <COMMENT>{
-     "*/"      BEGIN(INITIAL);
+     "*/"      BEGIN(INITIAL); /* This identifies when the comment actually ends. 
+                                Go to the default routine when its discovered */
      [^*\n]+   /* Eat the comment between asterisks */
-     "*"       /* Ignore asterisk */
+     "*"       /* Ignore the asterisk itself (for multi-line comments) */
      \n        numberLines++; /* Keep record of the current line */
 }
 
+"//".* /* Ignore single-line comments of this type */
 
 {DIGIT} {return INT_NUM; }
 
-{DIGIT}"."{DIGIT}+ {    /* This expression is used to differentiate floating point numbers from integer ones */
+{DIGIT}"."{DIGIT}+ {    /* This expression is used to differentiate floating 
+                        point numbers from integer ones */
             return FLOAT_NUM;
 }
 
-{HEX} { return INT_NUM; }
+{HEX} { return INT_NUM; } /* Hex numbers are defined as integers */
 
-{OCTAL} { return INT_NUM; }
+{OCTAL} { return INT_NUM; } /* Octal numbers are defined as integers */
 
 
 "if" { return IF; }
@@ -174,7 +169,7 @@ COMMENT     ("/*"([^*]|([*]+[^*/]))*[*]+"/")|"//".*
 
 ";" { return SEMICOLON; }
 
-"," /* Ignore comma. Since is a token of the language, but not used in the grammar */
+"," /* Ignore comma. Since it is a token of the language, but not used in the grammar */
 
 
 "+" { return PLUS; }
@@ -194,7 +189,7 @@ COMMENT     ("/*"([^*]|([*]+[^*/]))*[*]+"/")|"//".*
     return RELATIONAL;
 }
 
-{EXPONENTIAL} { return FLOAT_NUM; }
+{EXPONENTIAL} { return FLOAT_NUM; } /* Exponential numbers are only floats for this language */
 
 {ID} { return ID; }
 
@@ -204,9 +199,8 @@ COMMENT     ("/*"([^*]|([*]+[^*/]))*[*]+"/")|"//".*
 \n             numberLines++;  /* When a newline is found, add 1 to the global 
                                 counter to track the line numbers */
 
-. {             /* When an unknown token is found, indicate an error */
-             printf("|         ERROR           | %11s (Line %2d) |\n", yytext, numberLines);
-             printf("--------------------------------------------------\n"); 
+. {             /* When an unknown token is found, indicate an error and exit */
+             printf("Unknown token %s found in line %d \n\n", yytext, numberLines);
+             exit(-1);
 }        
-
 %%

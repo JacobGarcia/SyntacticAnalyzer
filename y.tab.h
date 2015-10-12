@@ -96,10 +96,10 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 17 "SyntaxAnalyzer.y"
+#line 72 "SyntaxAnalyzer.y"
 {
-	int intVal;
-	float floatVal;
+	int intVal; /* Value of int number */
+	float floatVal; /* Value of float number */
 }
 /* Line 1529 of yacc.c.  */
 #line 106 "y.tab.h"

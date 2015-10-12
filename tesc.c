@@ -3,7 +3,7 @@
 /* Definitions go first */
 
 int j;
-float i;
+float $i;
 int h;
 int h2;
 float h3
