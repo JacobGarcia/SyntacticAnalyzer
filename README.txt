@@ -3,7 +3,7 @@ Copyright © 2014 Mario J. García
 =========================================
 
 =========================================
-+             USEFUL NOTES 		+
++             USEFUL NOTES 				+
 =========================================
 The source code, version changes, and
 more information about the project can
@@ -11,7 +11,7 @@ be found in:
 github.com/JacobGarcia/SyntacticAnalyzer
 
 =========================================
-+             CONTRIBUTORS 		+
++             CONTRIBUTORS 				+
 =========================================
 Mario Jacob García Navarro   - A01363206
 
