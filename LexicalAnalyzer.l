@@ -169,7 +169,7 @@ ASSIGNMENT	:=
 
 ";" { return SEMICOLON; }
 
-"," /* Ignore comma. Since it is a token of the language, but not used in the grammar */
+"," /* Ignore the comma. Since it is a token of the language, but not used in the grammar */
 
 
 "+" { return PLUS; }

@@ -36,8 +36,8 @@
 /*          Oct 11 13:48 2015 - File created                        	 */
 /*																	     */
 /*          Sep 09 20:10 2015 - The scanner indicates success or error   */
-/*								based on a syntactic analysis based on   */
-/*								the Tiny C grammar 						 */
+/*								based on a syntactic analysis on the 	 */
+/*								Tiny C grammar 							 */
 /*                                                                       */
 /* Error handling:                                                       */
 /*          When a syntactic error is found, the program exits and 		 */
@@ -45,10 +45,11 @@
 /*			Take account that the file is read from "top to bottom"      */
 /* 																		 */
 /* Notes:																 */
-/*			For errors that occurs after a new line is found by Flex	 */
+/*			For errors that occurs after a new line is found by Flex,	 */
 /*			for example, semicolon errors, consider that the line where  */
 /*			error is indicated is the next line actually. This is 		 */
-/*			Flex adds the newline before Bison indicates a parse error.  */
+/*			because Flex adds the newline before Bison indicates a parse */
+/*			error.  													 */
 /*                                                                       */
 /*************************************************************************/
 
@@ -101,7 +102,7 @@ defining a C union holding each of the types of tokens that Flex could return */
 %token ASSIGNMENT
 %token RELATIONAL
 
-/* In order to avoid ambiguity, it's needed a precedence assignation to the rules 
+/* In order to avoid ambiguity, it's needed a precedence assignation to the rules. 
 This gives ELSE more precedence over NOT_ELSE simply because this is declared first. */
 %nonassoc NOT_ELSE
 %nonassoc ELSE
@@ -178,7 +179,7 @@ epsilon: ;
 /*					  is only cared about syntactic errors, the input is */
 /*					  basically ignored. Due to the fact that Bison      */
 /*					  expects sending a string when calls yyerror, the   */
-/*					  function must remain it's default definition       */
+/*					  function must remain its default definition       */
 /*                                                                       */
 /*            Output:   The line where the syntax error occured (see 	 */
 /*						notes for possible side effects)         		 */
@@ -186,7 +187,7 @@ epsilon: ;
 /*************************************************************************/
 void yyerror(char *string){
    printf("Syntax error in line %d \n\n", numberLines);
-   exit(-1);
+   exit(-1); /* Finish the execution */
 }
 
 /*************************************************************************/
@@ -195,7 +196,8 @@ void yyerror(char *string){
 int main(){
    yyparse();
 
-   /* If there was no errors, finish the program and a legend to it */
+   /* If there was no errors, finish the program and add a legend to the
+   output  */
    printf("There is no syntax errors in the code\n\n");
    return 0;
 }

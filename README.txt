@@ -1,9 +1,9 @@
-#Syntactic Analyzer For Tiny C
+Syntactic Analyzer For Tiny C
 Copyright © 2014 Mario J. García
 =========================================
 
 =========================================
-+             USEFUL NOTES 				+
++             USEFUL NOTES              +
 =========================================
 The source code, version changes, and
 more information about the project can
@@ -11,7 +11,7 @@ be found in:
 github.com/JacobGarcia/SyntacticAnalyzer
 
 =========================================
-+             CONTRIBUTORS 				+
++             CONTRIBUTORS              +
 =========================================
 Mario Jacob García Navarro   - A01363206
 
@@ -38,9 +38,9 @@ the analyzer will ignore them.
 =========================================
 
 ------------------------------------------
-	  bison -yd SyntacticAnalyzer.y
-	  flex LexicalAnalyzer.l
-	  gcc y.tab.c lex.yy.c -o scanner -ll
+   bison -yd SyntacticAnalyzer.y
+   flex LexicalAnalyzer.l
+   gcc y.tab.c lex.yy.c -o scanner -ll
 ------------------------------------------
 
 When the build is executed, the c program 
@@ -50,7 +50,7 @@ that the test file must be in the same
 folder. If that were not the case, then 
 add the file address.
 -----------------------------------------
-	/.scanner < test.c
+            /.scanner < test.c
 -----------------------------------------
 
 -----------------------------------------
