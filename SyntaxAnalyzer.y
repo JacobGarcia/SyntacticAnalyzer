@@ -25,7 +25,7 @@
 /*              http://dinosaur.compilertools.net/bison/index.html       */
 /*                                                                       */
 /* File formats:                                                         */
-/*          The input file should have a "valid" C(Tiny C) program       */ 
+/*          The input file should have a "valid" C(Tiny C) program       */
 /*                                                                       */
 /* Restrictions:                                                         */
 /*          Actually, any text file can be passed from the command line, */
@@ -57,8 +57,10 @@
 /*                         Declaration Section                           */
 /*************************************************************************/
 %{
-	#include <stdio.h> /* Used for the printf function */
-	#include <stdlib.h> /* Used for the exit() function when an error is 
+	#include "table.h"  /* Symbol table structure */
+	#include <string.h> /* Used for the strcmp and the strdup functions */
+	#include <stdio.h>  /* Used for the printf function */
+	#include <stdlib.h> /* Used for the exit() function when an error is
                         discovered */
 
 	/* Function definitions */
@@ -68,11 +70,12 @@
 	extern int numberLines; /* Counter of newlines. Defined in Flex */
 %}
 
-/* Tokens could be of any arbitrary data type. It's dealt with that in Bison by 
+/* Tokens could be of any arbitrary data type. It's dealt with that in Bison by
 defining a C union holding each of the types of tokens that Flex could return */
 %union{
 	int intVal; /* Value of int number */
 	float floatVal; /* Value of float number */
+	struct symtab *symp; /* Pointer to the symbol table */
 }
 
 /*************************************************************************/
@@ -102,7 +105,7 @@ defining a C union holding each of the types of tokens that Flex could return */
 %token ASSIGNMENT
 %token RELATIONAL
 
-/* In order to avoid ambiguity, it's needed a precedence assignation to the rules. 
+/* In order to avoid ambiguity, it's needed a precedence assignation to the rules.
 This gives ELSE more precedence over NOT_ELSE simply because this is declared first. */
 %nonassoc NOT_ELSE
 %nonassoc ELSE
@@ -114,24 +117,24 @@ This gives ELSE more precedence over NOT_ELSE simply because this is declared fi
 program: var_dec stmt_seq
 		 ;
 
-var_dec: var_dec single_dec 
-		 | epsilon 
+var_dec: var_dec single_dec
+		 | epsilon
 		 ;
 
-single_dec: type ID SEMICOLON 
+single_dec: type ID SEMICOLON
 			;
 
-type: INT 
-	  | FLOAT 
+type: INT
+	  | FLOAT
 	  ;
 
 stmt_seq: stmt_seq stmt
-		  | epsilon 
+		  | epsilon
 		  ;
 
 stmt: IF exp THEN stmt %prec NOT_ELSE /* Higher precedence is given to shifting */
 	  | IF exp THEN stmt ELSE stmt
-	  | WHILE exp DO stmt  
+	  | WHILE exp DO stmt
 	  | variable ASSIGNMENT exp SEMICOLON
 	  | READ LPAREN variable RPAREN SEMICOLON
 	  | WRITE LPAREN exp RPAREN SEMICOLON
@@ -145,19 +148,19 @@ exp: simple_exp RELATIONAL simple_exp
 	 | simple_exp
 	 ;
 
-simple_exp: simple_exp PLUS term 
-			| simple_exp MINUS term 
+simple_exp: simple_exp PLUS term
+			| simple_exp MINUS term
 			| term
 			;
 
 term: term TIMES factor
-	  | term DIV factor  
+	  | term DIV factor
 	  | factor
 	  ;
 
-factor: LPAREN exp RPAREN 
-		| INT_NUM 
-		| FLOAT_NUM  
+factor: LPAREN exp RPAREN
+		| INT_NUM
+		| FLOAT_NUM
 		| variable
 		;
 
@@ -190,14 +193,51 @@ void yyerror(char *string){
    exit(-1); /* Finish the execution */
 }
 
+/* This function looks for a name in the symbol table, if it is */
+/* not there it store it in the next available space.           */
+struct symtab *symlook(char *s) {
+    char *p;
+    struct symtab *sp;
+    for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
+        /* is it already here? */
+        if(sp->name && !strcmp(sp->name, s))
+            return sp;
+
+        /* is it free */
+        if(!sp->name) {
+            sp->name = strdup(s);
+            return sp;
+        }
+        /* otherwise continue to next */
+    }
+
+    yyerror("Too many symbols");
+    exit(1);    /* cannot continue */
+} /* symlook */
+
+void printTable(){
+	struct symtab *sp;
+	for(sp = symtab; sp < &symtab[NSYMS]; sp++){
+		if(sp->name){
+			printf("|      %10s                |\n", sp->name);
+			printf("----------------------------------\n");
+		}
+	}
+}
 /*************************************************************************/
 /*                            Main entry point                           */
-/*************************************************************************/ 
+/*************************************************************************/
 int main(){
    yyparse();
 
    /* If there was no errors, finish the program and add a legend to the
    output  */
    printf("There is no syntax errors in the code\n\n");
+
+	 /* Create Table Header */
+	 printf("---------------------------------\n");
+	 printf("|             SYMBOL             |\n");
+	 printf("---------------------------------\n");
+	 printTable();
    return 0;
 }

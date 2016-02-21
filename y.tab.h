@@ -96,13 +96,14 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 72 "SyntaxAnalyzer.y"
+#line 75 "SyntaxAnalyzer.y"
 {
 	int intVal; /* Value of int number */
 	float floatVal; /* Value of float number */
+	struct symtab *symp; /* Pointer to the symbol table */
 }
 /* Line 1529 of yacc.c.  */
-#line 106 "y.tab.h"
+#line 107 "y.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

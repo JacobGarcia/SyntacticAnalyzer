@@ -24,7 +24,7 @@
 /*              http://flex.sourceforge.net/manual/                      */
 /*                                                                       */
 /* File formats:                                                         */
-/*          The input file should have a "valid" C(Tiny C) program       */ 
+/*          The input file should have a "valid" C(Tiny C) program       */
 /*                                                                       */
 /* Restrictions:                                                         */
 /*          Actually, any text file can be passed from the command line, */
@@ -53,21 +53,16 @@
 /*************************************************************************/
 /*************************************************************************/
 /*                                                                       */
-/*  (int)idToDel: This variable expresses the index that is used to      */
-/*                indicate that a number is octal (which is always in    */
-/*                he second position of the string). This is used for    */
-/*                the octal to decimal conversion                        */
-/*                                                                       */
 /*  (int)numberLines: This is a simple counter of newlines. It is used   */
 /*                    whenever an error occurs, showing the user the     */
 /*                    line where the error has arise                     */
 /*                                                                       */
 /*************************************************************************/
 %{
-    #include <stdlib.h> /* Used for the exit() function when an error is 
+    #include <stdlib.h> /* Used for the exit() function when an error is
                         discovered */
     #include "y.tab.h" /* Inclusion of Bison reference tokens */
-    int idToDel = 1; 
+    #include "table.h" /* Symbols table */
     int numberLines = 1;
 %}
 
@@ -90,8 +85,6 @@
 /*                                                                       */
 /*  ID: Identifiers that are supported in ANSI C                         */
 /*                                                                       */
-/*  KEYWORD: A set of reserved words supported by Tiny C                 */
-/*                                                                       */
 /*  RELATIONAL: Tokens used when comparing two elements                  */
 /*                                                                       */
 /*  ASSIGNMENT: Used when assigning a value to an identifier. Consider   */
@@ -102,24 +95,24 @@
 /*           Considering single-line comments and multi-line ones        */
 /*                                                                       */
 /*************************************************************************/
-DIGIT		[0-9]|[1-9][0-9]* 
+DIGIT		[0-9]|[1-9][0-9]*
 EXPONENTIAL [0-9]*"."[0-9]+[e|E][-|+]?[0-9]+
 HEX			0(x|X)[0-9A-Fa-f]+
 OCTAL		0(c|C)[0-7]+
 ID       	[A-Za-z_][A-Za-z0-9_]*
 RELATIONAL 	<|<=|>|>=|!=|==
 ASSIGNMENT	:=
-%x COMMENT 
+%x COMMENT
 
 /*************************************************************************/
 /*                              Rules Section                            */
 /*************************************************************************/
 %%
-"/*"              BEGIN(COMMENT); /* In case a comment is discovered, begin the 
+"/*"              BEGIN(COMMENT); /* In case a comment is discovered, begin the
                                     routine to handle comments */
 
 <COMMENT>{
-     "*/"      BEGIN(INITIAL); /* This identifies when the comment actually ends. 
+     "*/"      BEGIN(INITIAL); /* This identifies when the comment actually ends.
                                 Go to the default routine when its discovered */
      [^*\n]+   /* Eat the comment between asterisks */
      "*"       /* Ignore the asterisk itself (for multi-line comments) */
@@ -130,7 +123,7 @@ ASSIGNMENT	:=
 
 {DIGIT} {return INT_NUM; }
 
-{DIGIT}"."{DIGIT}+ {    /* This expression is used to differentiate floating 
+{DIGIT}"."{DIGIT}+ {    /* This expression is used to differentiate floating
                         point numbers from integer ones */
             return FLOAT_NUM;
 }
@@ -191,16 +184,19 @@ ASSIGNMENT	:=
 
 {EXPONENTIAL} { return FLOAT_NUM; } /* Exponential numbers are only floats for this language */
 
-{ID} { return ID; }
+{ID} {
+  yylval.symp = symlook(yytext);
+  return ID;
+}
 
 
-[ \t]+          /* Eat up the whitespace */    
+[ \t]+          /* Eat up the whitespace */
 
-\n             numberLines++;  /* When a newline is found, add 1 to the global 
+\n             numberLines++;  /* When a newline is found, add 1 to the global
                                 counter to track the line numbers */
 
 . {             /* When an unknown token is found, indicate an error and exit */
              printf("Unknown token %s found in line %d \n\n", yytext, numberLines);
              exit(-1);
-}        
+}
 %%

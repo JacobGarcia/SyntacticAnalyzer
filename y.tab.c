@@ -122,10 +122,12 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 58 "SyntaxAnalyzer.y"
+#line 59 "SyntaxAnalyzer.y"
 
-	#include <stdio.h> /* Used for the printf function */
-	#include <stdlib.h> /* Used for the exit() function when an error is 
+	#include "table.h"  /* Symbol table structure */
+	#include <string.h> /* Used for the strcmp and the strdup functions */
+	#include <stdio.h>  /* Used for the printf function */
+	#include <stdlib.h> /* Used for the exit() function when an error is
                         discovered */
 
 	/* Function definitions */
@@ -155,13 +157,14 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 72 "SyntaxAnalyzer.y"
+#line 75 "SyntaxAnalyzer.y"
 {
 	int intVal; /* Value of int number */
 	float floatVal; /* Value of float number */
+	struct symtab *symp; /* Pointer to the symbol table */
 }
 /* Line 193 of yacc.c.  */
-#line 165 "y.tab.c"
+#line 168 "y.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -174,7 +177,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 178 "y.tab.c"
+#line 181 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -471,10 +474,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   113,   113,   116,   117,   120,   123,   124,   127,   128,
-     131,   132,   133,   134,   135,   136,   137,   140,   143,   144,
-     147,   148,   149,   152,   153,   154,   157,   158,   159,   160,
-     163,   166
+       0,   117,   117,   120,   121,   124,   127,   128,   131,   132,
+     135,   136,   137,   138,   139,   140,   141,   144,   147,   148,
+     151,   152,   153,   156,   157,   158,   161,   162,   163,   164,
+     167,   170
 };
 #endif
 
@@ -1416,7 +1419,7 @@ yyreduce:
     {
       
 /* Line 1267 of yacc.c.  */
-#line 1420 "y.tab.c"
+#line 1423 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1630,7 +1633,7 @@ yyreturn:
 }
 
 
-#line 167 "SyntaxAnalyzer.y"
+#line 171 "SyntaxAnalyzer.y"
 
 
 /*************************************************************************/
@@ -1645,7 +1648,7 @@ yyreturn:
 /*					  is only cared about syntactic errors, the input is */
 /*					  basically ignored. Due to the fact that Bison      */
 /*					  expects sending a string when calls yyerror, the   */
-/*					  function must remain it's default definition       */
+/*					  function must remain its default definition       */
 /*                                                                       */
 /*            Output:   The line where the syntax error occured (see 	 */
 /*						notes for possible side effects)         		 */
@@ -1653,16 +1656,55 @@ yyreturn:
 /*************************************************************************/
 void yyerror(char *string){
    printf("Syntax error in line %d \n\n", numberLines);
-   exit(-1);
+   exit(-1); /* Finish the execution */
 }
 
+/* This function looks for a name in the symbol table, if it is */
+/* not there it store it in the next available space.           */
+struct symtab *symlook(char *s) {
+    char *p;
+    struct symtab *sp;
+    for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
+        /* is it already here? */
+        if(sp->name && !strcmp(sp->name, s))
+            return sp;
+
+        /* is it free */
+        if(!sp->name) {
+            sp->name = strdup(s);
+            return sp;
+        }
+        /* otherwise continue to next */
+    }
+
+    yyerror("Too many symbols");
+    exit(1);    /* cannot continue */
+} /* symlook */
+
+void printTable(){
+	struct symtab *sp;
+	for(sp = symtab; sp < &symtab[NSYMS]; sp++){
+		if(sp->name){
+			printf("|      %10s                |\n", sp->name);
+			printf("----------------------------------\n");
+		}
+	}
+}
 /*************************************************************************/
 /*                            Main entry point                           */
-/*************************************************************************/ 
+/*************************************************************************/
 int main(){
    yyparse();
 
-   /* If there was no errors, finish the program and a legend to it */
+   /* If there was no errors, finish the program and add a legend to the
+   output  */
    printf("There is no syntax errors in the code\n\n");
+
+	 /* Create Table Header */
+	 printf("---------------------------------\n");
+	 printf("|             SYMBOL             |\n");
+	 printf("---------------------------------\n");
+	 printTable();
    return 0;
 }
+

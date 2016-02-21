@@ -552,7 +552,7 @@ char *yytext;
 /*              http://flex.sourceforge.net/manual/                      */
 /*                                                                       */
 /* File formats:                                                         */
-/*          The input file should have a "valid" C(Tiny C) program       */ 
+/*          The input file should have a "valid" C(Tiny C) program       */
 /*                                                                       */
 /* Restrictions:                                                         */
 /*          Actually, any text file can be passed from the command line, */
@@ -580,21 +580,16 @@ char *yytext;
 /*************************************************************************/
 /*************************************************************************/
 /*                                                                       */
-/*  (int)idToDel: This variable expresses the index that is used to      */
-/*                indicate that a number is octal (which is always in    */
-/*                he second position of the string). This is used for    */
-/*                the octal to decimal conversion                        */
-/*                                                                       */
 /*  (int)numberLines: This is a simple counter of newlines. It is used   */
 /*                    whenever an error occurs, showing the user the     */
 /*                    line where the error has arise                     */
 /*                                                                       */
 /*************************************************************************/
-#line 67 "LexicalAnalyzer.l"
-    #include <stdlib.h> /* Used for the exit() function when an error is 
+#line 62 "LexicalAnalyzer.l"
+    #include <stdlib.h> /* Used for the exit() function when an error is
                         discovered */
     #include "y.tab.h" /* Inclusion of Bison reference tokens */
-    int idToDel = 1; 
+    #include "table.h" /* Symbols table */
     int numberLines = 1;
 /*************************************************************************/
 /*                       User Defined MACROS Section                     */
@@ -614,8 +609,6 @@ char *yytext;
 /*                                                                       */
 /*  ID: Identifiers that are supported in ANSI C                         */
 /*                                                                       */
-/*  KEYWORD: A set of reserved words supported by Tiny C                 */
-/*                                                                       */
 /*  RELATIONAL: Tokens used when comparing two elements                  */
 /*                                                                       */
 /*  ASSIGNMENT: Used when assigning a value to an identifier. Consider   */
@@ -626,11 +619,11 @@ char *yytext;
 /*           Considering single-line comments and multi-line ones        */
 /*                                                                       */
 /*************************************************************************/
- 
+
 /*************************************************************************/
 /*                              Rules Section                            */
 /*************************************************************************/
-#line 634 "lex.yy.c"
+#line 627 "lex.yy.c"
 
 #define INITIAL 0
 #define COMMENT 1
@@ -813,9 +806,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 117 "LexicalAnalyzer.l"
+#line 110 "LexicalAnalyzer.l"
 
-#line 819 "lex.yy.c"
+#line 812 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -900,207 +893,210 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 118 "LexicalAnalyzer.l"
-BEGIN(COMMENT); /* In case a comment is discovered, begin the 
+#line 111 "LexicalAnalyzer.l"
+BEGIN(COMMENT); /* In case a comment is discovered, begin the
                                     routine to handle comments */
 	YY_BREAK
 
 case 2:
 YY_RULE_SETUP
-#line 122 "LexicalAnalyzer.l"
-BEGIN(INITIAL); /* This identifies when the comment actually ends. 
+#line 115 "LexicalAnalyzer.l"
+BEGIN(INITIAL); /* This identifies when the comment actually ends.
                                 Go to the default routine when its discovered */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 124 "LexicalAnalyzer.l"
+#line 117 "LexicalAnalyzer.l"
 /* Eat the comment between asterisks */
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 125 "LexicalAnalyzer.l"
+#line 118 "LexicalAnalyzer.l"
 /* Ignore the asterisk itself (for multi-line comments) */
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 126 "LexicalAnalyzer.l"
+#line 119 "LexicalAnalyzer.l"
 numberLines++; /* Keep record of the current line */
 	YY_BREAK
 
 case 6:
 YY_RULE_SETUP
-#line 129 "LexicalAnalyzer.l"
+#line 122 "LexicalAnalyzer.l"
 /* Ignore single-line comments of this type */
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 131 "LexicalAnalyzer.l"
+#line 124 "LexicalAnalyzer.l"
 {return INT_NUM; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 133 "LexicalAnalyzer.l"
-{    /* This expression is used to differentiate floating 
+#line 126 "LexicalAnalyzer.l"
+{    /* This expression is used to differentiate floating
                         point numbers from integer ones */
             return FLOAT_NUM;
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 138 "LexicalAnalyzer.l"
+#line 131 "LexicalAnalyzer.l"
 { return INT_NUM; } /* Hex numbers are defined as integers */
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 140 "LexicalAnalyzer.l"
+#line 133 "LexicalAnalyzer.l"
 { return INT_NUM; } /* Octal numbers are defined as integers */
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 143 "LexicalAnalyzer.l"
+#line 136 "LexicalAnalyzer.l"
 { return IF; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 145 "LexicalAnalyzer.l"
+#line 138 "LexicalAnalyzer.l"
 { return THEN; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 147 "LexicalAnalyzer.l"
+#line 140 "LexicalAnalyzer.l"
 { return ELSE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 149 "LexicalAnalyzer.l"
+#line 142 "LexicalAnalyzer.l"
 { return INT; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 151 "LexicalAnalyzer.l"
+#line 144 "LexicalAnalyzer.l"
 { return FLOAT; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 153 "LexicalAnalyzer.l"
+#line 146 "LexicalAnalyzer.l"
 { return WHILE; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 155 "LexicalAnalyzer.l"
+#line 148 "LexicalAnalyzer.l"
 { return DO; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 157 "LexicalAnalyzer.l"
+#line 150 "LexicalAnalyzer.l"
 { return READ; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 159 "LexicalAnalyzer.l"
+#line 152 "LexicalAnalyzer.l"
 { return WRITE; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 162 "LexicalAnalyzer.l"
+#line 155 "LexicalAnalyzer.l"
 { return LBRACE; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 164 "LexicalAnalyzer.l"
+#line 157 "LexicalAnalyzer.l"
 { return RBRACE; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 166 "LexicalAnalyzer.l"
+#line 159 "LexicalAnalyzer.l"
 { return LPAREN; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 168 "LexicalAnalyzer.l"
+#line 161 "LexicalAnalyzer.l"
 { return RPAREN; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 170 "LexicalAnalyzer.l"
+#line 163 "LexicalAnalyzer.l"
 { return SEMICOLON; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 172 "LexicalAnalyzer.l"
-/* Ignore comma. Since it is a token of the language, but not used in the grammar */
+#line 165 "LexicalAnalyzer.l"
+/* Ignore the comma. Since it is a token of the language, but not used in the grammar */
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 175 "LexicalAnalyzer.l"
+#line 168 "LexicalAnalyzer.l"
 { return PLUS; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 177 "LexicalAnalyzer.l"
+#line 170 "LexicalAnalyzer.l"
 { return MINUS; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 179 "LexicalAnalyzer.l"
+#line 172 "LexicalAnalyzer.l"
 { return TIMES; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 181 "LexicalAnalyzer.l"
+#line 174 "LexicalAnalyzer.l"
 { return DIV; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 184 "LexicalAnalyzer.l"
+#line 177 "LexicalAnalyzer.l"
 {
     return ASSIGNMENT;
 }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 188 "LexicalAnalyzer.l"
+#line 181 "LexicalAnalyzer.l"
 {
     return RELATIONAL;
 }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 192 "LexicalAnalyzer.l"
+#line 185 "LexicalAnalyzer.l"
 { return FLOAT_NUM; } /* Exponential numbers are only floats for this language */
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 194 "LexicalAnalyzer.l"
-{ return ID; }
+#line 187 "LexicalAnalyzer.l"
+{
+  yylval.symp = symlook(yytext);
+  return ID;
+}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 197 "LexicalAnalyzer.l"
-/* Eat up the whitespace */    
+#line 193 "LexicalAnalyzer.l"
+/* Eat up the whitespace */
 	YY_BREAK
 case 35:
 /* rule 35 can match eol */
 YY_RULE_SETUP
-#line 199 "LexicalAnalyzer.l"
-numberLines++;  /* When a newline is found, add 1 to the global 
+#line 195 "LexicalAnalyzer.l"
+numberLines++;  /* When a newline is found, add 1 to the global
                                 counter to track the line numbers */
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 202 "LexicalAnalyzer.l"
+#line 198 "LexicalAnalyzer.l"
 {             /* When an unknown token is found, indicate an error and exit */
              printf("Unknown token %s found in line %d \n\n", yytext, numberLines);
              exit(-1);
-}        
+}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 206 "LexicalAnalyzer.l"
+#line 202 "LexicalAnalyzer.l"
 ECHO;
 	YY_BREAK
-#line 1104 "lex.yy.c"
+#line 1100 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
 	yyterminate();
@@ -2098,7 +2094,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 206 "LexicalAnalyzer.l"
+#line 202 "LexicalAnalyzer.l"
 
 
 
