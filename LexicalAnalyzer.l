@@ -17,11 +17,14 @@
 /*                                                                       */
 /* References:                                                           */
 /*          The material that describes regular expressions and Lex/Flex */
-/*          usage covered in the class notes for TC2006.                 */
+/*          usage covered in the class notes for TC2006 & TC3048.        */
 /*          The manual for Flex 2.5.37 for syntactical references,       */
 /*          patterns, start conditions, usage and simple examples. Can   */
 /*          be found in:                                                 */
 /*              http://flex.sourceforge.net/manual/                      */
+/*                                                                       */
+/*				 The official documentation for GLib 2.46.2, which can be			 */
+/*				 found online at https://developer.gnome.org/glib/unstable/.	 */
 /*                                                                       */
 /* File formats:                                                         */
 /*          The input file should have a "valid" C(Tiny C) program       */
@@ -41,6 +44,8 @@
 /*                              tokens for Bison usage instead of        */
 /*                              printing them                            */
 /*                                                                       */
+/*          Feb 21 19:58     - The scanner now implements a symbols      */
+/*                             table from a GLib hash table              */
 /* Error handling:                                                       */
 /*          When unknown tokens are found, the program indicates an      */
 /*          error on the line where the token was found and shows the    */
@@ -61,6 +66,7 @@
 %{
     #include <stdlib.h> /* Used for the exit() function when an error is
                         discovered */
+    #include <string.h> /* Used for strdup() function */
     #include "y.tab.h" /* Inclusion of Bison reference tokens */
     #include "table.h" /* Symbols table */
     int numberLines = 1;
@@ -185,7 +191,16 @@ ASSIGNMENT	:=
 {EXPONENTIAL} { return FLOAT_NUM; } /* Exponential numbers are only floats for this language */
 
 {ID} {
-  yylval.symp = symlook(yytext);
+  char *key; /* The key for the hash table is the symbol itself */
+  key = strdup(yytext); /* Duplicate the symbol string. If this is not done,
+                        the reference for the string will be different,
+                        causing to create another entry for the hash table */
+
+  g_hash_table_insert(symtab, key, "0"); /* Insert the string into the symbols table */
+                                        /* Right now there is no values for the symbols,
+                                       since that will require a semantic analysis. Instead
+                                       of inserting the actual value, a 0 is given for
+                                       all the encountered symbols */
   return ID;
 }
 
