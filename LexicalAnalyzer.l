@@ -41,6 +41,8 @@
 /*                              tokens for Bison usage instead of        */
 /*                              printing them                            */
 /*                                                                       */
+/*          Feb 21 19:55 2016 - Added symbols table implementation			 */
+/*                                                                       */
 /* Error handling:                                                       */
 /*          When unknown tokens are found, the program indicates an      */
 /*          error on the line where the token was found and shows the    */
@@ -185,7 +187,8 @@ ASSIGNMENT	:=
 {EXPONENTIAL} { return FLOAT_NUM; } /* Exponential numbers are only floats for this language */
 
 {ID} {
-  yylval.symp = symlook(yytext);
+  yylval.symp = symlook(yytext); /* Insert the symbol in the table, if it does
+                                  not exists already */
   return ID;
 }
 

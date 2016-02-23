@@ -2,7 +2,7 @@
 /*	   Header for the shared symbol table                       */
 /*                                                              */
 
-#define NSYMS 30	   /* Assume a maximum number of 20 symbols */
+#define NSYMS 30	   /* Assume a maximum number of 30 symbols */
 
 struct symtab {
   char *name;                    /* The name is just the string */

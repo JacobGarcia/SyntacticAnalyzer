@@ -1,7 +1,15 @@
 Syntactic Analyzer For Tiny C
 Copyright © 2014 Mario J. García
 =========================================
-
+=========================================
++               IMPORTANT               +
+=========================================
+The implementation using a dynamic
+structure can be found in:
+github.com/JacobGarcia/SyntacticAnalyzer
+(branch DEV). Consider that the DEV 
+version does not print the type of 
+variable in the symbols table
 =========================================
 +             USEFUL NOTES              +
 =========================================
@@ -9,7 +17,7 @@ The source code, version changes, and
 more information about the project can
 be found in: 
 github.com/JacobGarcia/SyntacticAnalyzer
-
+(branch MASTER)
 =========================================
 +             CONTRIBUTORS              +
 =========================================
@@ -38,9 +46,7 @@ the analyzer will ignore them.
 =========================================
 
 ------------------------------------------
-   bison -yd SyntacticAnalyzer.y
-   flex LexicalAnalyzer.l
-   gcc y.tab.c lex.yy.c -o scanner -ll
+                  make
 ------------------------------------------
 
 When the build is executed, the c program 

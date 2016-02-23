@@ -33,23 +33,25 @@
 /*                                                                       */
 /* Revision history:                                                     */
 /*                                                                       */
-/*          Oct 11 13:48 2015 - File created                        	 */
-/*																	     */
+/*          Oct 11 13:48 2015 - File created                        	   */
+/*																	     																 */
 /*          Sep 09 20:10 2015 - The scanner indicates success or error   */
-/*								based on a syntactic analysis on the 	 */
-/*								Tiny C grammar 							 */
+/*								based on a syntactic analysis on the 	 								 */
+/*								Tiny C grammar 							 													 */
+/*																																			 */
+/*          Feb 21 19:55 2016 - Added symbols table implementation			 */
 /*                                                                       */
 /* Error handling:                                                       */
-/*          When a syntactic error is found, the program exits and 		 */
-/*			indicates the line where the actual error was found. 		 */
-/*			Take account that the file is read from "top to bottom"      */
-/* 																		 */
-/* Notes:																 */
-/*			For errors that occurs after a new line is found by Flex,	 */
-/*			for example, semicolon errors, consider that the line where  */
-/*			error is indicated is the next line actually. This is 		 */
-/*			because Flex adds the newline before Bison indicates a parse */
-/*			error.  													 */
+/*          When a syntactic error is found, the program exits and 		   */
+/*			indicates the line where the actual error was found. 		         */
+/*			Take account that the file is read from "top to bottom"          */
+/* 																		 																   */
+/* Notes:																 																 */
+/*			For errors that occurs after a new line is found by Flex,	 			 */
+/*			for example, semicolon errors, consider that the line where  		 */
+/*			error is indicated is the next line actually. This is 		 			 */
+/*			because Flex adds the newline before Bison indicates a parse 		 */
+/*			error.  													 															 */
 /*                                                                       */
 /*************************************************************************/
 
@@ -75,7 +77,7 @@ defining a C union holding each of the types of tokens that Flex could return */
 %union{
 	int intVal; /* Value of int number */
 	float floatVal; /* Value of float number */
-	char *type;
+	char *string; /* Value of a string */
 	struct symtab *symp; /* Pointer to the symbol table */
 }
 
@@ -84,7 +86,7 @@ defining a C union holding each of the types of tokens that Flex could return */
 /*************************************************************************/
 %token <intVal> INT_NUM
 %token <floatVal> FLOAT_NUM
-%token <symp> ID
+%token <symp> ID /* The ID is located at the symbols table */
 %token LBRACE
 %token RBRACE
 %token LPAREN
@@ -106,7 +108,8 @@ defining a C union holding each of the types of tokens that Flex could return */
 %token ASSIGNMENT
 %token RELATIONAL
 
-%type <intVal> type
+ /* Specify the attribute for those non-terminal symbols of interest */
+%type <string> type
 
 /* In order to avoid ambiguity, it's needed a precedence assignation to the rules.
 This gives ELSE more precedence over NOT_ELSE simply because this is declared first. */
@@ -124,11 +127,14 @@ var_dec: var_dec single_dec
 		 | epsilon
 		 ;
 
-single_dec: type ID SEMICOLON {$2->type = strdup($<type>1);}
+single_dec: type ID SEMICOLON {
+	/* Copy the type into the table of symbols */
+	$2->type = strdup($<string>1);
+}
 			;
 
-type: INT {$<type>$ = "int";}
-	  | FLOAT {$<type>$ = "float";}
+type: INT {$<string>$ = "int";} /* Type string assignation based on rules */
+	  | FLOAT {$<string>$ = "float";}
 	  ;
 
 stmt_seq: stmt_seq stmt
@@ -175,20 +181,20 @@ epsilon: ;
 
 /*************************************************************************/
 /*                                                                       */
-/*  Function: yyerror                            		                 */
+/*  Function: yyerror                            		                 		 */
 /*                                                                       */
 /*  Purpose: The function will be called in case Bison finds a rule not  */
-/*			 defined in the grammar                                      */
+/*			 defined in the grammar                                      		 */
 /*                                                                       */
 /*  Parameters:                                                          */
 /*            Input : A string indicating the type of error. Since it    */
-/*					  is only cared about syntactic errors, the input is */
-/*					  basically ignored. Due to the fact that Bison      */
-/*					  expects sending a string when calls yyerror, the   */
-/*					  function must remain its default definition       */
+/*					  is only cared about syntactic errors, the input is 				 */
+/*					  basically ignored. Due to the fact that Bison     			   */
+/*					  expects sending a string when calls yyerror, the   				 */
+/*					  function must remain its default definition       				 */
 /*                                                                       */
-/*            Output:   The line where the syntax error occured (see 	 */
-/*						notes for possible side effects)         		 */
+/*            Output:   The line where the syntax error occured (see 	 	 */
+/*						notes for possible side effects)         		 							 */
 /*                                                                       */
 /*************************************************************************/
 void yyerror(char *string){
@@ -218,9 +224,23 @@ struct symtab *symlook(char *s) {
     exit(1);    /* cannot continue */
 } /* symlook */
 
+/*************************************************************************/
+/*                                                                       */
+/*  Function: printTable	                            		               */
+/*                                                                       */
+/*  Purpose: Print the actual contents of the symbols table. In the form */
+/*					 type - variable																						 */
+/*                                                                       */
+/*  Parameters:																													 */
+/*            Output:   The actual contents of the symbols table	 			 */
+/*                                                                       */
+/*************************************************************************/
 void printTable(){
 	struct symtab *sp;
+	/* Iterate over all the values in the symbols table structure */
 	for(sp = symtab; sp < &symtab[NSYMS]; sp++){
+		/* If there is an actual value on a specific memory address,
+		print its contents */
 		if(sp->name){
 			printf("|    %5s       |   %5s       |\n", sp->type, sp->name);
 			printf("----------------------------------\n");
@@ -241,6 +261,8 @@ int main(){
 	 printf("----------------------------------\n");
 	 printf("|      TYPE      |     SYMBOL    |\n");
 	 printf("----------------------------------\n");
+
+	 /* Print the actual table */
 	 printTable();
    return 0;
 }
