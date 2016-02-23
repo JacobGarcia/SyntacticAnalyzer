@@ -161,10 +161,11 @@ typedef union YYSTYPE
 {
 	int intVal; /* Value of int number */
 	float floatVal; /* Value of float number */
+	char *type;
 	struct symtab *symp; /* Pointer to the symbol table */
 }
 /* Line 193 of yacc.c.  */
-#line 168 "y.tab.c"
+#line 169 "y.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -177,7 +178,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 181 "y.tab.c"
+#line 182 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -474,10 +475,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   117,   117,   120,   121,   124,   127,   128,   131,   132,
-     135,   136,   137,   138,   139,   140,   141,   144,   147,   148,
-     151,   152,   153,   156,   157,   158,   161,   162,   163,   164,
-     167,   170
+       0,   120,   120,   123,   124,   127,   131,   132,   135,   136,
+     139,   140,   141,   142,   143,   144,   145,   148,   151,   152,
+     155,   156,   157,   160,   161,   162,   165,   166,   167,   168,
+     171,   174
 };
 #endif
 
@@ -1417,9 +1418,25 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-      
+        case 5:
+#line 127 "SyntaxAnalyzer.y"
+    {(yyvsp[(2) - (3)].symp)->type = (yyvsp[(1) - (3)].intVal);
+															}
+    break;
+
+  case 6:
+#line 131 "SyntaxAnalyzer.y"
+    {(yyval.intVal) = 0;}
+    break;
+
+  case 7:
+#line 132 "SyntaxAnalyzer.y"
+    {(yyval.intVal) = 1;}
+    break;
+
+
 /* Line 1267 of yacc.c.  */
-#line 1423 "y.tab.c"
+#line 1440 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1633,7 +1650,7 @@ yyreturn:
 }
 
 
-#line 171 "SyntaxAnalyzer.y"
+#line 175 "SyntaxAnalyzer.y"
 
 
 /*************************************************************************/
@@ -1683,9 +1700,15 @@ struct symtab *symlook(char *s) {
 
 void printTable(){
 	struct symtab *sp;
+	char * type;
 	for(sp = symtab; sp < &symtab[NSYMS]; sp++){
 		if(sp->name){
-			printf("|      %10s                |\n", sp->name);
+			if(sp->type == 0){
+				type = strdup("int");
+			}else {
+				type = strdup("float");
+			}
+			printf("|    %5s       |   %5s       |\n", type, sp->name);
 			printf("----------------------------------\n");
 		}
 	}
@@ -1701,9 +1724,9 @@ int main(){
    printf("There is no syntax errors in the code\n\n");
 
 	 /* Create Table Header */
-	 printf("---------------------------------\n");
-	 printf("|             SYMBOL             |\n");
-	 printf("---------------------------------\n");
+	 printf("----------------------------------\n");
+	 printf("|      TYPE      |     SYMBOL    |\n");
+	 printf("----------------------------------\n");
 	 printTable();
    return 0;
 }

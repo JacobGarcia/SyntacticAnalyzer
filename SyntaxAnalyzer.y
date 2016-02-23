@@ -75,6 +75,7 @@ defining a C union holding each of the types of tokens that Flex could return */
 %union{
 	int intVal; /* Value of int number */
 	float floatVal; /* Value of float number */
+	char *type;
 	struct symtab *symp; /* Pointer to the symbol table */
 }
 
@@ -83,7 +84,7 @@ defining a C union holding each of the types of tokens that Flex could return */
 /*************************************************************************/
 %token <intVal> INT_NUM
 %token <floatVal> FLOAT_NUM
-%token ID
+%token <symp> ID
 %token LBRACE
 %token RBRACE
 %token LPAREN
@@ -105,6 +106,8 @@ defining a C union holding each of the types of tokens that Flex could return */
 %token ASSIGNMENT
 %token RELATIONAL
 
+%type <intVal> type
+
 /* In order to avoid ambiguity, it's needed a precedence assignation to the rules.
 This gives ELSE more precedence over NOT_ELSE simply because this is declared first. */
 %nonassoc NOT_ELSE
@@ -121,11 +124,12 @@ var_dec: var_dec single_dec
 		 | epsilon
 		 ;
 
-single_dec: type ID SEMICOLON
+single_dec: type ID SEMICOLON {$2->type = $1;
+															}
 			;
 
-type: INT
-	  | FLOAT
+type: INT {$$ = 0;}
+	  | FLOAT {$$ = 1;}
 	  ;
 
 stmt_seq: stmt_seq stmt
@@ -217,9 +221,15 @@ struct symtab *symlook(char *s) {
 
 void printTable(){
 	struct symtab *sp;
+	char * type;
 	for(sp = symtab; sp < &symtab[NSYMS]; sp++){
 		if(sp->name){
-			printf("|      %10s                |\n", sp->name);
+			if(sp->type == 0){
+				type = strdup("int");
+			}else {
+				type = strdup("float");
+			}
+			printf("|    %5s       |   %5s       |\n", type, sp->name);
 			printf("----------------------------------\n");
 		}
 	}
@@ -235,9 +245,9 @@ int main(){
    printf("There is no syntax errors in the code\n\n");
 
 	 /* Create Table Header */
-	 printf("---------------------------------\n");
-	 printf("|             SYMBOL             |\n");
-	 printf("---------------------------------\n");
+	 printf("----------------------------------\n");
+	 printf("|      TYPE      |     SYMBOL    |\n");
+	 printf("----------------------------------\n");
 	 printTable();
    return 0;
 }

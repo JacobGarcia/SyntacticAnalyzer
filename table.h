@@ -6,7 +6,7 @@
 
 struct symtab {
   char *name;                    /* The name is just the string */
-  float value;                          /* The value is a float */
+  int type;                      /* The type for the variable */
 } symtab[NSYMS];
 
 /* Function prototype for the symbol table look up routine */

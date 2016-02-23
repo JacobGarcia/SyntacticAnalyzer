@@ -100,10 +100,11 @@ typedef union YYSTYPE
 {
 	int intVal; /* Value of int number */
 	float floatVal; /* Value of float number */
+	char *type;
 	struct symtab *symp; /* Pointer to the symbol table */
 }
 /* Line 1529 of yacc.c.  */
-#line 107 "y.tab.h"
+#line 108 "y.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
