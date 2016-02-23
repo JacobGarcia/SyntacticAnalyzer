@@ -124,12 +124,11 @@ var_dec: var_dec single_dec
 		 | epsilon
 		 ;
 
-single_dec: type ID SEMICOLON {$2->type = $1;
-															}
+single_dec: type ID SEMICOLON {$2->type = strdup($<type>1);}
 			;
 
-type: INT {$$ = 0;}
-	  | FLOAT {$$ = 1;}
+type: INT {$<type>$ = "int";}
+	  | FLOAT {$<type>$ = "float";}
 	  ;
 
 stmt_seq: stmt_seq stmt
@@ -221,15 +220,9 @@ struct symtab *symlook(char *s) {
 
 void printTable(){
 	struct symtab *sp;
-	char * type;
 	for(sp = symtab; sp < &symtab[NSYMS]; sp++){
 		if(sp->name){
-			if(sp->type == 0){
-				type = strdup("int");
-			}else {
-				type = strdup("float");
-			}
-			printf("|    %5s       |   %5s       |\n", type, sp->name);
+			printf("|    %5s       |   %5s       |\n", sp->type, sp->name);
 			printf("----------------------------------\n");
 		}
 	}

@@ -475,10 +475,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   120,   120,   123,   124,   127,   131,   132,   135,   136,
-     139,   140,   141,   142,   143,   144,   145,   148,   151,   152,
-     155,   156,   157,   160,   161,   162,   165,   166,   167,   168,
-     171,   174
+       0,   120,   120,   123,   124,   127,   130,   131,   134,   135,
+     138,   139,   140,   141,   142,   143,   144,   147,   150,   151,
+     154,   155,   156,   159,   160,   161,   164,   165,   166,   167,
+     170,   173
 };
 #endif
 
@@ -1420,23 +1420,22 @@ yyreduce:
     {
         case 5:
 #line 127 "SyntaxAnalyzer.y"
-    {(yyvsp[(2) - (3)].symp)->type = (yyvsp[(1) - (3)].intVal);
-															}
+    {(yyvsp[(2) - (3)].symp)->type = strdup((yyvsp[(1) - (3)].type));}
     break;
 
   case 6:
-#line 131 "SyntaxAnalyzer.y"
-    {(yyval.intVal) = 0;}
+#line 130 "SyntaxAnalyzer.y"
+    {(yyval.type) = "int";}
     break;
 
   case 7:
-#line 132 "SyntaxAnalyzer.y"
-    {(yyval.intVal) = 1;}
+#line 131 "SyntaxAnalyzer.y"
+    {(yyval.type) = "float";}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1440 "y.tab.c"
+#line 1439 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1650,7 +1649,7 @@ yyreturn:
 }
 
 
-#line 175 "SyntaxAnalyzer.y"
+#line 174 "SyntaxAnalyzer.y"
 
 
 /*************************************************************************/
@@ -1700,15 +1699,9 @@ struct symtab *symlook(char *s) {
 
 void printTable(){
 	struct symtab *sp;
-	char * type;
 	for(sp = symtab; sp < &symtab[NSYMS]; sp++){
 		if(sp->name){
-			if(sp->type == 0){
-				type = strdup("int");
-			}else {
-				type = strdup("float");
-			}
-			printf("|    %5s       |   %5s       |\n", type, sp->name);
+			printf("|    %5s       |   %5s       |\n", sp->type, sp->name);
 			printf("----------------------------------\n");
 		}
 	}
