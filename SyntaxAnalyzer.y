@@ -43,7 +43,7 @@
 /*								Tiny C grammar 							 													 */
 /*																																			 */
 /*				  Feb 21 19:55 2016 - Added symbols table implementation			 */
-/*														 using a GLib Hash Table									 */
+/*														  using a GLib Hash Table									 */
 /*                                                                       */
 /* Error handling:                                                       */
 /*      When a syntactic error is found, the program exits and 		 			 */
@@ -53,7 +53,7 @@
 /* Notes:																																 */
 /*			For errors that occurs after a new line is found by Flex,	 			 */
 /*			for example, semicolon errors, consider that the line where 		 */
-/*			error is indicated is the next line actually. This is 		 			 */
+/*			the error is indicated is the next line actually. This is 		 	 */
 /*			because Flex adds the newline before Bison indicates a parse 		 */
 /*			error.  													 															 */
 /*                                                                       */
@@ -64,7 +64,7 @@
 /*************************************************************************/
 %{
 	#include "table.h"  /* Symbol table structure */
-	#include <stdio.h>  /* Used for the printf function */
+	#include <stdio.h>  /* Used for the printf() function */
 	#include <stdlib.h> /* Used for the exit() function when an error is
                         discovered */
 	#include <string.h> /* Used for the strdup() function */
@@ -116,6 +116,7 @@ This gives ELSE more precedence over NOT_ELSE simply because this is declared fi
 %nonassoc NOT_ELSE
 %nonassoc ELSE
 
+/* Specify the attribute for those non-terminal symbols of interest */
 %type <string> type
 /*************************************************************************/
 /*                         	Grammar Rules Section                        */
@@ -211,8 +212,7 @@ void yyerror(char *string){
 /*  Function: printTypeVariable                            		           */
 /*                                                                       */
 /*  Purpose: Print the actual contents of the hash table. In the form,	 */
-/*					 key - value. Since the tracking of the actual values is 	   */
-/*					 semantic dependant, expect all the values to be zero 			 */
+/*					 type - variable																						 */
 /*                                                                       */
 /*  Parameters:																													 */
 /*						Input:		3 gpointers (a.k.a void *)             			     */

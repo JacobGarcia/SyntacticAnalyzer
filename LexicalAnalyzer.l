@@ -191,7 +191,7 @@ ASSIGNMENT	:=
 {EXPONENTIAL} { return FLOAT_NUM; } /* Exponential numbers are only floats for this language */
 
 {ID} {
-  yylval.string = yytext;
+  yylval.string = yytext; /* Assign the string value for the ID's */
   return ID;
 }
 
