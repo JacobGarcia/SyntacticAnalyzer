@@ -191,16 +191,7 @@ ASSIGNMENT	:=
 {EXPONENTIAL} { return FLOAT_NUM; } /* Exponential numbers are only floats for this language */
 
 {ID} {
-  char *key; /* The key for the hash table is the symbol itself */
-  key = strdup(yytext); /* Duplicate the symbol string. If this is not done,
-                        the reference for the string will be different,
-                        causing to create another entry for the hash table */
-
-  g_hash_table_insert(symtab, key, "0"); /* Insert the string into the symbols table */
-                                        /* Right now there is no values for the symbols,
-                                       since that will require a semantic analysis. Instead
-                                       of inserting the actual value, a 0 is given for
-                                       all the encountered symbols */
+  yylval.string = yytext;
   return ID;
 }
 

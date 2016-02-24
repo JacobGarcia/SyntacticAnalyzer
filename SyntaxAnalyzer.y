@@ -67,6 +67,7 @@
 	#include <stdio.h>  /* Used for the printf function */
 	#include <stdlib.h> /* Used for the exit() function when an error is
                         discovered */
+	#include <string.h> /* Used for the strdup() function */
 
 	/* Function definitions */
 	void yyerror (char *string); /* Bison does NOT implement yyerror */
@@ -80,6 +81,7 @@ defining a C union holding each of the types of tokens that Flex could return */
 %union{
 	int intVal; /* Value of int number */
 	float floatVal; /* Value of float number */
+	char *string; /* Value of a string */
 }
 
 /*************************************************************************/
@@ -87,7 +89,7 @@ defining a C union holding each of the types of tokens that Flex could return */
 /*************************************************************************/
 %token <intVal> INT_NUM
 %token <floatVal> FLOAT_NUM
-%token ID
+%token <string> ID
 %token LBRACE
 %token RBRACE
 %token LPAREN
@@ -114,6 +116,7 @@ This gives ELSE more precedence over NOT_ELSE simply because this is declared fi
 %nonassoc NOT_ELSE
 %nonassoc ELSE
 
+%type <string> type
 /*************************************************************************/
 /*                         	Grammar Rules Section                        */
 /*************************************************************************/
@@ -125,11 +128,17 @@ var_dec: var_dec single_dec
 		 | epsilon
 		 ;
 
-single_dec: type ID SEMICOLON
+single_dec: type ID {
+						char *id = strdup($2); /* Duplicate the symbol string. If this is not done,
+					                        the reference for the string will be different,
+					                        causing to create another entry for the hash table */
+						/* Insert the string into the symbols table */
+						g_hash_table_insert(symtab, id, $1);
+					} SEMICOLON
 			;
 
-type: INT
-	  | FLOAT
+type: INT {$<string>$ = "int"; }
+	  | FLOAT {$<string>$ = "float"; }
 	  ;
 
 stmt_seq: stmt_seq stmt
@@ -199,7 +208,7 @@ void yyerror(char *string){
 
 /*************************************************************************/
 /*                                                                       */
-/*  Function: printKeyValue                            		               */
+/*  Function: printTypeVariable                            		           */
 /*                                                                       */
 /*  Purpose: Print the actual contents of the hash table. In the form,	 */
 /*					 key - value. Since the tracking of the actual values is 	   */
@@ -210,13 +219,13 @@ void yyerror(char *string){
 /*            Output:   The actual contents of the hash table	 					 */
 /*                                                                       */
 /*************************************************************************/
-void printKeyValue(gpointer key, gpointer value, gpointer userData) {
+void printTypeVariable(gpointer variable, gpointer type, gpointer userData) {
 	/* Castings to its original type of data */
-   char *realKey = (char *)key;
-   //char *realValue = (char *)value;
+   char *realType = (char *)type;
+   char *realVariable = (char *)variable;
 
-   printf("|      %10s              |\n", realKey);
-	 printf("--------------------------------\n");
+	 printf("|    %5s       |   %5s       |\n", realType, realVariable);
+	 printf("----------------------------------\n");
    return;
 }
 
@@ -236,7 +245,7 @@ void printTable(){
 	recieves 3 gpointers, the key, the value & the user_data) which
 	will be applied to each element, and finally any additional information that
 	the user desires. In this case, nothing is specified. */
-	g_hash_table_foreach(symtab, printKeyValue, NULL);
+	g_hash_table_foreach(symtab, printTypeVariable, NULL);
 }
 
 /*************************************************************************/
@@ -253,9 +262,9 @@ int main(){
    printf("There is no syntax errors in the code\n\n");
 
 	 /* Create Table Header */
-	 printf("--------------------------------\n");
-	 printf("|            SYMBOL            |\n");
-	 printf("--------------------------------\n");
+	 printf("----------------------------------\n");
+	 printf("|      TYPE      |     SYMBOL    |\n");
+	 printf("----------------------------------\n");
 
 	 printTable();
 
